@@ -1,5 +1,5 @@
 window.MEMORIES = [
-  { img: 'images/att.att.IsdDneG6o1CpBgvuARXpLAA_N0AXhoO2Fee86JONsyk.JPG', msg: 'Kỉ niệm 1 năm iu nhau' },
+  { img: 'images/att.IsdDneG6o1CpBgvuARXpLAA_N0AXhoO2Fee86JONsyk.JPG', msg: 'Kỉ niệm 1 năm iu nhau' },
   { img: 'images/IMG_0224.JPG', msg: 'Lúc còn xa, đang tán tỉnh tán tỉnh các thứ' },
   { img: 'images/FB3EF077-170E-4CBD-B2B3-DC0619376FAA.JPG', msg: 'Lúc anh ngỏ lời và được đồng ý 💕' },
   { img: 'images/IMG_1728.JPG', msg: 'Dạm ngõ - đẹp mặt 2 anh chị chưa' },
