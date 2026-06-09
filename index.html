@@ -178,6 +178,62 @@
     0%,100%{box-shadow:0 6px 30px rgba(255,107,200,.7),0 0 0 0 rgba(255,107,200,.55);}
     50%{box-shadow:0 6px 34px rgba(255,107,200,.9),0 0 0 18px rgba(255,107,200,0);}
   }
+
+  /* ---------- Tinh linh "catch me" ---------- */
+  #catcher{
+    position:fixed;left:0;top:0;z-index:18;display:none;align-items:center;gap:8px;
+    cursor:pointer;pointer-events:auto;will-change:transform;
+  }
+  #catcher .bf{
+    position:relative;width:26px;height:22px;flex:0 0 auto;perspective:150px;
+    filter:drop-shadow(0 0 6px rgba(255,120,205,.85));
+  }
+  #catcher .bf .w{
+    position:absolute;top:0;width:12px;height:22px;
+    background:radial-gradient(circle at 50% 36%,#fff 0%,#ffc6ee 42%,#ff7ed0 100%);
+  }
+  #catcher .bf .w.l{ left:0;border-radius:78% 32% 65% 45% / 66% 52% 58% 44%;transform-origin:right center;animation:flapL .28s ease-in-out infinite alternate; }
+  #catcher .bf .w.r{ right:0;border-radius:32% 78% 45% 65% / 52% 66% 44% 58%;transform-origin:left center;animation:flapR .28s ease-in-out infinite alternate; }
+  #catcher .bf .body{ position:absolute;left:50%;top:3px;width:2px;height:16px;margin-left:-1px;border-radius:2px;background:rgba(255,140,210,.85);z-index:2; }
+  #catcher .bf .body::before,#catcher .bf .body::after{ content:'';position:absolute;top:-5px;width:1.4px;height:7px;background:rgba(255,150,215,.9);border-radius:2px; }
+  #catcher .bf .body::before{ left:-1px;transform-origin:bottom;transform:rotate(-30deg); }
+  #catcher .bf .body::after{ right:-1px;transform-origin:bottom;transform:rotate(30deg); }
+  #catcher .lbl{
+    font-size:13px;font-weight:800;color:#fff;white-space:nowrap;
+    text-shadow:0 0 10px rgba(255,107,200,1);background:rgba(120,30,110,.45);
+    padding:3px 10px;border-radius:999px;
+  }
+  @keyframes flapL{ from{transform:rotateY(8deg);} to{transform:rotateY(50deg);} }
+  @keyframes flapR{ from{transform:rotateY(-8deg);} to{transform:rotateY(-50deg);} }
+
+  /* ---------- Mini game + vòng quay ---------- */
+  #game{
+    position:fixed;inset:0;z-index:26;display:flex;align-items:center;justify-content:center;
+    background:rgba(40,8,50,.72);backdrop-filter:blur(8px);
+    opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;
+  }
+  #game.show{opacity:1;visibility:visible;}
+  #game .gbox{
+    position:relative;width:min(440px,92vw);background:linear-gradient(160deg,#fff,#ffe9f5);color:#5a0b46;
+    border-radius:22px;padding:28px 26px;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center;
+    transform:translateY(20px) scale(.96);transition:transform .45s cubic-bezier(.16,1,.3,1);
+  }
+  #game.show .gbox{transform:none;}
+  #game .gclose{position:absolute;top:10px;right:14px;font-size:24px;cursor:pointer;color:#a05a8a;line-height:1;}
+  #game .qnum{font-size:13px;font-weight:700;color:#a05a8a;margin-bottom:8px;}
+  #game .qtext{font-size:18px;font-weight:800;line-height:1.45;margin-bottom:16px;}
+  #game input{width:100%;border:2px solid #ffc1e3;border-radius:12px;padding:11px 14px;font-size:15px;font-family:inherit;color:#5a0b46;text-align:center;}
+  #game input:focus{outline:none;border-color:#ff6bc8;}
+  #game .qerr{min-height:18px;font-size:13px;color:#e0407a;margin:9px 0;font-weight:700;}
+  .shake{animation:shake .4s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);}}
+  .wtitle{font-size:17px;font-weight:800;margin-bottom:14px;line-height:1.4;}
+  .wheelStage{position:relative;width:300px;max-width:76vw;aspect-ratio:1;margin:0 auto 16px;}
+  #wheel{width:100%;height:100%;border-radius:50%;box-shadow:0 10px 30px rgba(0,0,0,.35);}
+  .wheelStage .pointer{position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-top:28px solid #ff2e86;filter:drop-shadow(0 2px 4px rgba(0,0,0,.45));z-index:2;}
+  .wheelStage .hub{position:absolute;top:50%;left:50%;width:42px;height:42px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 2px 10px rgba(0,0,0,.35);z-index:2;}
+  .wresult{margin-top:4px;font-size:17px;font-weight:800;min-height:26px;color:#a01060;}
+  .wresult small{display:block;font-weight:600;color:#7a3a66;margin-top:10px;font-size:13.5px;font-style:italic;}
 </style>
 </head>
 <body>
@@ -209,6 +265,33 @@
       <img id="viewerImg" alt="kỉ niệm" />
       <video id="viewerVideo" controls playsinline preload="metadata"></video>
       <div class="caption" id="viewerCaption"></div>
+    </div>
+  </div>
+
+  <!-- Tinh linh "catch me" (con bướm đập cánh) -->
+  <div id="catcher"><span class="bf"><i class="w l"></i><i class="w r"></i><i class="body"></i></span><span class="lbl">catch me ✨</span></div>
+
+  <!-- Mini game + vòng quay chiếc nón kì diệu -->
+  <div id="game">
+    <div class="gbox">
+      <div class="gclose" id="gClose">×</div>
+      <div id="quiz">
+        <div class="qnum" id="qNum"></div>
+        <div class="qtext" id="qText"></div>
+        <input id="qInput" type="text" placeholder="Nhập câu trả lời..." autocomplete="off" />
+        <div class="qerr" id="qErr"></div>
+        <button class="btn primary" id="qSubmit">Trả lời</button>
+      </div>
+      <div id="wheelWrap" hidden>
+        <div class="wtitle">Em giỏi lắm, em đã trúng thưởng:</div>
+        <div class="wheelStage">
+          <div class="pointer"></div>
+          <canvas id="wheel" width="400" height="400"></canvas>
+          <div class="hub"></div>
+        </div>
+        <button class="btn primary" id="spinBtn">Quay 🎡</button>
+        <div class="wresult" id="wResult"></div>
+      </div>
     </div>
   </div>
 
@@ -652,6 +735,7 @@ function updateIntro(t){
       introState='done';
       bigHeart.visible=false; bigGlow.visible=false; sparkles.forEach(sp=>sp.s.visible=false);
       camera.position.set(0,12,46); controls.target.set(0,10.5,0); controls.enabled=true; controls.autoRotate=true; controls.update();
+      startCatcher();                              // thả tinh linh "catch me" bay quanh màn hình
       return false;
     }
     const e=easeOut3(bp);
@@ -826,10 +910,116 @@ function animate(){
     if (p.z > 28) p.z = -28; else if (p.z < -28) p.z = 28;
   });
 
+  updateCatcher();                                 // tinh linh "catch me" bay quanh màn hình
+
   // intro chiếm camera; xong rồi mới trả quyền cho OrbitControls
   if (!updateIntro(t)) controls.update();
   renderer.render(scene, camera);
 }
+
+/* ============================================================
+   TINH LINH "catch me" + MINI GAME + VÒNG QUAY
+   ============================================================ */
+const catcherEl = document.getElementById('catcher');
+const catcher = { active:false, x:innerWidth*0.5, y:innerHeight*0.4, vx:3, vy:2 };
+function startCatcher(){
+  catcher.active = true;
+  catcher.x = innerWidth*(0.25+Math.random()*0.5);
+  catcher.y = innerHeight*(0.3+Math.random()*0.3);
+  const a = Math.random()*Math.PI*2, sp = 2;
+  catcher.vx = Math.cos(a)*sp; catcher.vy = Math.sin(a)*sp;
+  catcherEl.style.display = 'flex';
+}
+function updateCatcher(){
+  if (!catcher.active) return;
+  catcher.vx += (Math.random()-0.5)*0.45; catcher.vy += (Math.random()-0.5)*0.55;
+  const sp = Math.hypot(catcher.vx,catcher.vy)||1, max=3, min=1.8;
+  if (sp>max){ catcher.vx*=max/sp; catcher.vy*=max/sp; }
+  if (sp<min){ catcher.vx*=min/sp; catcher.vy*=min/sp; }
+  catcher.x += catcher.vx; catcher.y += catcher.vy;
+  const mX=80, mY=70;
+  if (catcher.x<mX){ catcher.x=mX; catcher.vx=Math.abs(catcher.vx); }
+  if (catcher.x>innerWidth-mX){ catcher.x=innerWidth-mX; catcher.vx=-Math.abs(catcher.vx); }
+  if (catcher.y<mY){ catcher.y=mY; catcher.vy=Math.abs(catcher.vy); }
+  if (catcher.y>innerHeight-mY){ catcher.y=innerHeight-mY; catcher.vy=-Math.abs(catcher.vy); }
+  catcherEl.style.transform = `translate(${catcher.x}px,${catcher.y}px)`;
+}
+catcherEl.addEventListener('click', ()=>{ catcher.active=false; catcherEl.style.display='none'; openGame(); });
+
+// ----- Mini game -----
+const QUESTIONS = [
+  { q:'Ngày đầu chúng mình nói chuyện là? (vd: 01-01-0001)', ok:a => a.replace(/[^0-9]/g,'') === '25112025' },
+  { q:'Buổi date đầu tiên mình đi đâu?',                     ok:a => /aeon/i.test(a) },
+  { q:'Trong lúc yêu em, anh bay từ Nhật về mấy lần?',      ok:a => /4/.test(a) || /b[ốo]n/i.test(a) },
+];
+let qi = 0, wrongCount = 0;
+const WRONG_MSGS = ['Chưa đúng thử lại nha 💕','Sai mất ồi, cố lên nào 💪','Hiu, 1 xíu nữa thôi 🥺','Anh buồn quạ 😭'];
+const gameEl=document.getElementById('game'), quizEl=document.getElementById('quiz'), wheelWrap=document.getElementById('wheelWrap');
+const qNum=document.getElementById('qNum'), qText=document.getElementById('qText'), qInput=document.getElementById('qInput'), qErr=document.getElementById('qErr');
+function openGame(){
+  qi=0; wrongCount=0; quizEl.hidden=false; wheelWrap.hidden=true; showQ();
+  gameEl.classList.add('show'); controls.autoRotate=false; controls.enabled=false;
+  setTimeout(()=>qInput.focus(), 350);
+}
+function closeGame(){ gameEl.classList.remove('show'); controls.enabled=true; controls.autoRotate=true; startCatcher(); }
+function showQ(){ const it=QUESTIONS[qi]; qNum.textContent=`Câu ${qi+1}/3`; qText.textContent=it.q; qInput.value=''; qErr.textContent=''; }
+function submitQ(){
+  const a=qInput.value.trim(); if(!a) return;
+  if (QUESTIONS[qi].ok(a)){
+    qi++;
+    if (qi>=QUESTIONS.length) startWheel();
+    else { showQ(); qInput.focus(); }
+  } else {
+    qErr.textContent = WRONG_MSGS[Math.min(wrongCount, WRONG_MSGS.length-1)];
+    wrongCount++;
+    quizEl.classList.remove('shake'); void quizEl.offsetWidth; quizEl.classList.add('shake');
+  }
+}
+document.getElementById('qSubmit').addEventListener('click', submitQ);
+qInput.addEventListener('keydown', e=>{ if(e.key==='Enter') submitQ(); });
+document.getElementById('gClose').addEventListener('click', closeGame);
+
+// ----- Vòng quay (chiếc nón kì diệu) -----
+const PRIZES = ['1 bữa Haidilao', 'Đi shopping', '1 yêu cầu bất kỳ từ em', '1 bữa Manhwa','1 bữa Mala :)))','Đi resort','Được 1 củ','Đi biển','Quá đen, tét mông 🍑','Đi thuỷ cung','Đi xem phim','Chơi 1 trò chơi nào đó', 'Được 3 củ'];
+const wheelCv=document.getElementById('wheel'), wResult=document.getElementById('wResult'), spinBtn=document.getElementById('spinBtn');
+function drawWheel(){
+  const ctx=wheelCv.getContext('2d'), N=PRIZES.length, R=wheelCv.width/2, seg=Math.PI*2/N;
+  ctx.clearRect(0,0,wheelCv.width,wheelCv.height);
+  const cols=['#ff8fc4','#c98bff','#ff6ba6','#b06bff','#ff9ed1','#9d6bff'];
+  for(let i=0;i<N;i++){
+    const a0=-Math.PI/2 + i*seg;
+    ctx.beginPath(); ctx.moveTo(R,R); ctx.arc(R,R,R-5,a0,a0+seg); ctx.closePath();
+    ctx.fillStyle=cols[i%cols.length]; ctx.fill();
+    ctx.save(); ctx.translate(R,R); ctx.rotate(a0+seg/2);
+    ctx.fillStyle='#fff'; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(0,0,0,.4)'; ctx.shadowBlur=3;
+    ctx.font = (PRIZES[i].length>13?'bold 15px':'bold 17px')+' "Segoe UI",sans-serif';
+    ctx.fillText(PRIZES[i], R-22, 0);
+    ctx.restore();
+  }
+  ctx.beginPath(); ctx.arc(R,R,R-5,0,Math.PI*2); ctx.lineWidth=6; ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.stroke();
+}
+function startWheel(){
+  quizEl.hidden=true; wheelWrap.hidden=false; wResult.textContent=''; spinBtn.disabled=false; spinBtn.textContent='Quay 🎡';
+  wheelCv.style.transition='none'; wheelCv.style.transform='rotate(0deg)';
+  drawWheel();
+}
+let spinning=false;
+spinBtn.addEventListener('click', ()=>{
+  if (spinning) return; spinning=true; spinBtn.disabled=true;
+  const N=PRIZES.length, segDeg=360/N, target=Math.floor(Math.random()*N);
+  const centerDeg=(target+0.5)*segDeg;
+  const finalDeg = 360*6 + (360-centerDeg) + (Math.random()*2-1)*(segDeg*0.34);
+  const dur=4800, t0=performance.now();
+  function frame(now){
+    const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3);
+    wheelCv.style.transform=`rotate(${finalDeg*e}deg)`;
+    if (p<1) requestAnimationFrame(frame);
+    else { spinning=false; wResult.innerHTML = `🎁 <b>${PRIZES[target]}</b><small>Hãy cap màn và gửi cho Anh yêu nhé em 💌</small>`; }
+  }
+  requestAnimationFrame(frame);
+});
+
 animate();
 
 addEventListener('resize', ()=>{
