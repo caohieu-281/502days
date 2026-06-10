@@ -11,6 +11,6 @@ window.MEMORIES = [
   { video: 'videos/att._tNfxorUkGDKEk-H6ijhaooNjgH0RqkFGuMkuNzsJR4.MP4',   msg: 'Khoảnh khắc em đồng ý 💍' },
   { video: 'videos/att.hDJwjy6WvXHwR7sAlToyfb1dlUw1Slrsd_3LZzVPPmc.MP4', msg: 'Dạo Tết cùng vại tương lơ 🎡' },
   { video: 'videos/77bac798d723433f9c26621914151683.MOV', msg: 'Điện ảnh chút thuiiii' },
-  { video: 'videos/IMG_2287.MOV', msg: 'Emiu ngã xe, thương vcđiênguc' },
+  { video: 'videos/IMG_2287.MOV', msg: 'Emiu ngã xe, thương điêng' },
   { video: 'videos/IMG_9340.MOV', msg: 'Chạy sml ở Shibuya, zuiiii' },
 ];
