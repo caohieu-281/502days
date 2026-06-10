@@ -232,8 +232,12 @@
   #wheel{width:100%;height:100%;border-radius:50%;box-shadow:0 10px 30px rgba(0,0,0,.35);}
   .wheelStage .pointer{position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-top:28px solid #ff2e86;filter:drop-shadow(0 2px 4px rgba(0,0,0,.45));z-index:2;}
   .wheelStage .hub{position:absolute;top:50%;left:50%;width:42px;height:42px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 2px 10px rgba(0,0,0,.35);z-index:2;}
-  .wresult{margin-top:4px;font-size:17px;font-weight:800;min-height:26px;color:#a01060;}
+  .wresult{margin-top:4px;font-size:17px;font-weight:800;min-height:26px;color:#a01060;line-height:1.5;}
   .wresult small{display:block;font-weight:600;color:#7a3a66;margin-top:10px;font-size:13.5px;font-style:italic;}
+  #wChoices{display:flex;flex-direction:column;gap:8px;margin:6px 0 4px;}
+  #wChoices .prompt{font-size:14px;font-weight:800;color:#a05a8a;margin-bottom:2px;}
+  #wChoices button{cursor:pointer;border:none;border-radius:999px;padding:11px 16px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(90deg,#ff6bc8,#c86bff);box-shadow:0 4px 14px rgba(255,107,200,.5);transition:transform .2s,box-shadow .2s;}
+  #wChoices button:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 7px 20px rgba(255,107,200,.7);}
 </style>
 </head>
 <body>
@@ -290,6 +294,7 @@
           <div class="hub"></div>
         </div>
         <button class="btn primary" id="spinBtn">Quay 🎡</button>
+        <div id="wChoices" hidden></div>
         <div class="wresult" id="wResult"></div>
       </div>
     </div>
@@ -999,23 +1004,54 @@ function drawWheel(){
   }
   ctx.beginPath(); ctx.arc(R,R,R-5,0,Math.PI*2); ctx.lineWidth=6; ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.stroke();
 }
+const wChoices=document.getElementById('wChoices');
+const MAX_SPINS=3;
+let spinning=false, spinsUsed=0, wheelRot=0, chosen=false, results=[];
 function startWheel(){
-  quizEl.hidden=true; wheelWrap.hidden=false; wResult.textContent=''; spinBtn.disabled=false; spinBtn.textContent='Quay 🎡';
+  quizEl.hidden=true; wheelWrap.hidden=false; wResult.textContent='';
+  spinning=false; spinsUsed=0; wheelRot=0; chosen=false; results=[];
+  spinBtn.hidden=false; spinBtn.disabled=false; spinBtn.textContent='Quay 🎡';
+  wChoices.hidden=true; wChoices.innerHTML='';
   wheelCv.style.transition='none'; wheelCv.style.transform='rotate(0deg)';
   drawWheel();
 }
-let spinning=false;
+function showResults(){
+  wResult.innerHTML = results.map((r,i)=>`Lần ${i+1}: <b>${r}</b>`).join('<br>');
+}
+function showChoices(){
+  spinBtn.hidden=true;
+  wChoices.hidden=false;
+  wChoices.innerHTML='<div class="prompt">Chọn 1 phần thưởng em thích nhất 💝</div>';
+  results.forEach(r=>{
+    const b=document.createElement('button'); b.textContent='🎁 '+r;
+    b.addEventListener('click', ()=>chooseResult(r));
+    wChoices.appendChild(b);
+  });
+}
+function chooseResult(r){
+  chosen=true; wChoices.hidden=true; spinBtn.hidden=true;
+  wResult.innerHTML = `🎁 <b>${r}</b><small>Hãy cap màn và gửi cho Anh yêu nhé em 💌</small>`;
+}
 spinBtn.addEventListener('click', ()=>{
-  if (spinning) return; spinning=true; spinBtn.disabled=true;
+  if (spinning || chosen || spinsUsed>=MAX_SPINS) return;
+  spinning=true; spinBtn.disabled=true;
   const N=PRIZES.length, segDeg=360/N, target=Math.floor(Math.random()*N);
   const centerDeg=(target+0.5)*segDeg;
-  const finalDeg = 360*6 + (360-centerDeg) + (Math.random()*2-1)*(segDeg*0.34);
-  const dur=4800, t0=performance.now();
+  const neededMod=(((360-centerDeg)%360)+360)%360;
+  const start=wheelRot;
+  const extra=((((neededMod-(start%360))%360)+360)%360) + 360*5 + (Math.random()*2-1)*(segDeg*0.32);
+  const finalDeg=start+extra, dur=4200, t0=performance.now();
   function frame(now){
     const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3);
-    wheelCv.style.transform=`rotate(${finalDeg*e}deg)`;
+    wheelCv.style.transform=`rotate(${start+(finalDeg-start)*e}deg)`;
     if (p<1) requestAnimationFrame(frame);
-    else { spinning=false; wResult.innerHTML = `🎁 <b>${PRIZES[target]}</b><small>Hãy cap màn và gửi cho Anh yêu nhé em 💌</small>`; }
+    else {
+      spinning=false; wheelRot=finalDeg; spinsUsed++; results.push(PRIZES[target]);
+      showResults();
+      const left=MAX_SPINS-spinsUsed;
+      if (left>0){ spinBtn.disabled=false; spinBtn.textContent=`Quay tiếp 🎡 (còn ${left})`; }
+      else { showChoices(); }
+    }
   }
   requestAnimationFrame(frame);
 });
